@@ -1,6 +1,10 @@
 import tweepy
 import time
 import shutil, pathlib, os
+import moviepy as mp
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+from random import randint
 
 
 
@@ -86,9 +90,22 @@ while i < len(os.listdir(part)):
         if os.path.abspath(part2 + "/" + sorted(os.listdir(part2))[2]).endswith(".mp4"):
             print("videogeldi")
             vidname = str(os.path.abspath(part2 + "/" + sorted(os.listdir(part2))[2]))
-            mediaa.append(vidname)
 
-            paylas(0, mediaa, os.path.abspath(part2))
+
+            clip = VideoFileClip(vidname)
+
+            if clip.duration > 119:
+                print("oldu")
+                new_vidname = str(os.path.abspath(part2 + "/" + str(randint(3)) + "_" + sorted(os.listdir(part2))[2]))
+                ffmpeg_extract_subclip(vidname, 0, 119, targetname=new_vidname)
+
+
+                mediaa.append(new_vidname)
+            else:
+                mediaa.append(vidname)
+
+
+            paylas(1, mediaa, os.path.abspath(part2))
 
             print("videopaylasildi")
 
@@ -114,8 +131,8 @@ while i < len(os.listdir(part)):
         z = open("kayit.txt", "w")
         z.close()
 
-        f = open("kayit.txt", "a")
-        f.write(str(i))
+        r = open("kayit.txt", "a")
+        r.write(str(i))
 
         time.sleep(920)
 
