@@ -2,9 +2,13 @@ import tweepy
 import time
 import shutil, pathlib, os
 import moviepy as mp
+from PIL import Image
 from moviepy.video.io.VideoFileClip import VideoFileClip
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 from random import randint
+
+from datetime import date
+
 
 
 
@@ -42,28 +46,21 @@ mediaa = []
 last_post_count = open("kayit.txt")
 i = int(last_post_count.read())
 
-def paylas(mediacount, mediaa, pathh):
+def paylas(mediacount, mediaa, pathh, part22):
+
 
     for images in os.listdir(pathh):
         # check if the image ends with jpg and take the first image that you find
         if images.endswith(".txt"):
             txt = images
-
     with open(part2 + "/" + txt, 'r', encoding="utf-8") as file:
         data = file.read().rstrip()
-
-    data = str(sorted(os.listdir(part))[i])[:10] + "\n" + data[:267] + ""
+    data = str(sorted(os.listdir(part))[i])[:10] + "\n" + data[:265] + ""
     print(data)
-
     media_w = []
-
-
-
     for s in range(mediacount):
         media_w.append(api.media_upload(os.path.join(pathh, mediaa[s])))
-
         #media_w[s] = api.media_upload(os.path.join(pathh, mediaa[s]))
-
     if mediacount == 1:
         newapi.create_tweet(text=data, media_ids=[media_w[0].media_id])
     elif mediacount == 2:
@@ -73,9 +70,11 @@ def paylas(mediacount, mediaa, pathh):
     else:
         newapi.create_tweet(text=data, media_ids=[media_w[0].media_id, media_w[1].media_id, media_w[2].media_id, media_w[3].media_id])
 
+
     file_extensions = []
     for f in range(int(mediacount)-1):
         file_extensions.append(pathlib.Path(mediaa[f]).suffix)
+
 
     mediaa.clear()
 
@@ -83,10 +82,22 @@ def paylas(mediacount, mediaa, pathh):
 while i < len(os.listdir(part)):
 
     try:
-        print(str(i) + "/" + str(len(os.listdir(part))))
-
         part2 = os.path.abspath(part + "/" + sorted(os.listdir(part))[i])
 
+        #webp to jpeg
+        for items in os.listdir(part2):
+
+            full_path = os.path.join(part2, items)
+
+            if items.endswith(".webp"):
+                im = Image.open(full_path).convert("RGB")
+
+                new_file_name = os.path.splitext(items)[0] + ".jpg"
+                im.save(os.path.join(os.listdir(part2), new_file_name), "JPEG")
+
+                os.remove(full_path)
+
+        #check the post type, video or image
         if os.path.abspath(part2 + "/" + sorted(os.listdir(part2))[2]).endswith(".mp4"):
             print("videogeldi")
             vidname = str(os.path.abspath(part2 + "/" + sorted(os.listdir(part2))[2]))
@@ -96,7 +107,7 @@ while i < len(os.listdir(part)):
 
             if clip.duration > 119:
                 print("oldu")
-                new_vidname = str(os.path.abspath(part2 + "/" + str(randint(3)) + "_" + sorted(os.listdir(part2))[2]))
+                new_vidname = str(os.path.abspath(part2 + "/" + str(randint(100,999)) + "_" + sorted(os.listdir(part2))[2]))
                 ffmpeg_extract_subclip(vidname, 0, 119, targetname=new_vidname)
 
 
@@ -105,7 +116,7 @@ while i < len(os.listdir(part)):
                 mediaa.append(vidname)
 
 
-            paylas(1, mediaa, os.path.abspath(part2))
+            paylas(1, mediaa, os.path.abspath(part2), part2)
 
             print("videopaylasildi")
 
@@ -113,7 +124,7 @@ while i < len(os.listdir(part)):
         else:
             a = 0
             for images in os.listdir(os.path.abspath(part2)):
-                # check if the image ends with jpg and take the first image that you find
+              # check if the image ends with jpg and take the first image that you find
                 if images.endswith(".jpg"):
                     print(os.path.abspath(part2 + "/" + images))
                     img.append(os.path.abspath(part2 + "/" + images))
@@ -122,7 +133,7 @@ while i < len(os.listdir(part)):
                 elif images.endswith(".txt"):
                     txt = images
 
-            paylas(a, img, os.path.abspath(part2))
+            paylas(a, img, os.path.abspath(part2), part2)
             img.clear()
 
 
